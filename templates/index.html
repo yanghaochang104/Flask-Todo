@@ -105,6 +105,22 @@
                 .then(jsonResponse => {
                     console.log('response', jsonResponse);
                     const li = document.createElement('li');
+                    const checkbox = document.createElement('input');
+                    checkbox.className = 'check-completed';
+                    checkbox.type = 'checkbox';
+                    checkbox.setAttribute('data-id', jsonResponse.id);
+                    checkbox.onchange = onClick_todo;
+                    li.appendChild(checkbox);
+
+                    const text = document.createTextNode(' ' + jsonResponse.description);
+                    li.appendChild(text);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-button';
+                    deleteBtn.setAttribute('data-id', jsonResponse.id);
+                    deleteBtn.innerHTML = '&cross;';
+                    deleteBtn.onclick = delete_todo;
+                    li.appendChild(deleteBtn);
                     document.getElementById('todos').appendChild(li);
                     document.getElementById('error').className = 'hidden';
                 })

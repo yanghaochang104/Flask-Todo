@@ -1,7 +1,8 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, request, url_for, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 import keys
 from flask_migrate import Migrate
+import sys
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = keys.DB_URL
@@ -21,6 +22,27 @@ class Todo(db.Model):
     def __repr__(self):
         return f'Todo {self.id} {self.description}'
 
+
+@app.route('/todos/create', methods=['POST'])
+def create_todo():
+    error = False
+    body = {}
+    try:
+        description = request.get_json()['description']
+        todo = Todo(description=description)
+        db.session.add(todo)
+        db.session.commit()
+        body['description'] = todo.description
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+    if error:
+        abort(400)
+    else:
+        return jsonify(body)
 
 @app.route('/')
 def index():
